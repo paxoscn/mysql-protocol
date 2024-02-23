@@ -2,7 +2,7 @@
 [![LICENSE](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/paxoscn/mysql-protocol/blob/master/LICENSE)
 [![Language](https://img.shields.io/badge/Language-Java-green)](https://www.oracle.com/java/technologies/)
 
-Chinese Readme: [README.md](https://github.com/paxoscn/mysql-protocol/blob/master/README.md)
+中文文档: [README.md](https://github.com/paxoscn/mysql-protocol/blob/master/README.md)
 
 ## A MySQL Protocol Implementation in Java
 

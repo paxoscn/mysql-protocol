@@ -97,14 +97,20 @@ class MySqlListenerTest {
 
         // Raise a connection to the server
         Class.forName("com.mysql.cj.jdbc.Driver");
+
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:" + port + "/" + database, user,  password);
              // Query an arbitrary SQL
              PreparedStatement ps = conn.prepareStatement("select * from dummy_table");
              ResultSet rs = ps.executeQuery()) {
+            boolean rowPassed = false;
+
             while (rs.next()) {
                 // Check the result
                 assertEquals("Hello World !", rs.getString(1));
+                rowPassed = true;
             }
+
+            assertTrue(rowPassed);
         }
     }
 }

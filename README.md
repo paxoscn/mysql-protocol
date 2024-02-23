@@ -2,83 +2,89 @@
 [![LICENSE](https://img.shields.io/badge/license-Apache%202-blue)](https://github.com/paxoscn/mysql-protocol/blob/master/LICENSE)
 [![Language](https://img.shields.io/badge/Language-Java-green)](https://www.oracle.com/java/technologies/)
 
-## A MySQL Protocol Implementation in Java
+英文文档: [README_EN.md](https://github.com/paxoscn/mysql-protocol/blob/master/README_EN.md)
 
-Forked from https://github.com/mheath/netty-mysql-codec
+## MySQL协议Java实现
 
-This project is useful on:
+改造自https://github.com/mheath/netty-mysql-codec
 
-- Implementing a database and making it ready to connect with MySQL compatible clients.
-- Proxy an arbitrary data source and make it act as a MySQL server.
-- Studying on MySQL Protocol.
+这个项目适用于:
 
-## Quick start
+- 实现自有数据库时并允许任何MySQL兼容客户端进行连接.
+- 代理任何数据源并将其封装为MySQL服务.
+- 学习MySQL协议.
 
-### Run unit tests
+## 快速开始
 
-To make sure the downloaded codes are complete, you can run [MySqlListenerTest.java](https://github.com/paxoscn/mysql-protocol/blob/master/src/test/java/cn/paxos/mysql/MySqlListenerTest.java) to see if it can be passed successfully.
+### 运行单元测试
 
-The test first runs a MySQL server with any queries resulting 'Hello World !'. Then it raises a JDBC connection and send a SQL to the server, checks the result and finally closes the server.
+为了确保代码下载完整, 你可以运行[MySqlListenerTest.java](https://github.com/paxoscn/mysql-protocol/blob/master/src/test/java/cn/paxos/mysql/MySqlListenerTest.java)
+来确认单元测试是否可以正确运行.
 
-### Create your own MySQL server
+这个单元测试会启动一个MySQL服务，对它的任何查询都只会返回'Hello World !'. 随后它会启动一个JDBC访问并发送一句SQL到服务器, 检查查询结果并关闭服务.
 
-The first thing you need to do is implementing a [SqlEngine](https://github.com/paxoscn/mysql-protocol/blob/master/src/main/java/cn/paxos/mysql/engine/SqlEngine.java)
+### 创建自己的MySQL服务
+
+首先你需要实现[SqlEngine](https://github.com/paxoscn/mysql-protocol/blob/master/src/main/java/cn/paxos/mysql/engine/SqlEngine.java)
 
 ```java
 public class YourSqlEngine implements SqlEngine {
 }
 ```
 
-To respond SQLs from the client, you need to implement query().
+要对客户端发过来的SQL进行响应，你需要实现query().
 
 ```java
 @Override
 public void query(ResultSetWriter resultSetWriter, String database, String userName, byte[] scramble411, byte[] authSeed, String sql) throws IOException {
-    // Build a result returning just one string column named 'col1'
-    // writeColumns() must be called before any invoking of writeRow()
+    // 在结果集中放入一列，名为'col1'
+    // 该调用必须在任意一次writeRow()之前
     resultSetWriter.writeColumns(List.of(new QueryResultColumn("col1", "varchar(255)")));
 
-    // Return just one row with content 'Hello World !'
+    // 在结果集中放入一行，值为'Hello World !'
     resultSetWriter.writeRow(List.of("Hello World !"));
 
-    // Do not forget to finish the response
+    // 最后需要调用finish()方法结束响应
     resultSetWriter.finish();
 }
 ```
 
-To protect your server from disallowed visiting, you need to implement authenticate().
+为了保护你的服务不被未授权人员访问, 你还需要实现authenticate().
 
 ```java
 @Override
 public void authenticate(String database, String userName, byte[] scramble411, byte[] authSeed) throws IOException {
-    // Block user if not named 'github'
+    // 只允许用户名'github'
     String validUser = "github";
     if (!userName.equals(validUser)) {
         throw new IOException(new IllegalAccessException("Authentication failed: User " + userName + " is not allowed to connect"));
     }
     
-    // Check if the password is '123456'
+    // 只允许密码'123456'
     String validPassword = "123456";
-    // SHA1 and encode the password
+    
+    // 对密码进行SHA1及编码
     String validPasswordSha1 = SHAUtils.SHA(validPassword, SHAUtils.SHA_1);
     String validScramble411WithSeed20 = Utils.scramble411(validPasswordSha1, authSeed);
-    // Compare and throw an exception if needed
+    
+    // 比较密码编码结果
     if (!Utils.compareDigest(validScramble411WithSeed20, Base64.getEncoder().encodeToString(scramble411))) {
         throw new IOException(new IllegalAccessException("Authentication failed: Validation failed"));
     }
 }
 ```
 
-Once the engine definition is ready, you can pass it into MySqlListener and then it will start listening a TCP port.
+实现完毕后, 你可以把实现类传入[MySqlListener](https://github.com/paxoscn/mysql-protocol/blob/master/src/main/java/cn/paxos/mysql/MySqlListener.java)，当它实例化后会自动监听指定TCP端口.
 
 ```java
-// Start and listen port 3307
+// 启动并监听端口3307
 new MySqlListener(3307, 100, new YourSqlEngine());
-// For test you can sleep for a while so you have enough time to connect to it.
+
+// 为了有足够时间来进行客户端连接，可以在这里sleep一段时间.
 Thread.sleep(1000L * 60 * 10);
 ```
 
-After starting of the server, you can open any favorite MySQL client to connect to it.
+启动服务后, 你可以用任何MySQL客户端来进行连接，以下以MySQL命令行客户端为例.
 
 ```shell
 mysql -h127.0.0.1 -P3307 -ugithub -p123456 dummy_db
@@ -91,10 +97,11 @@ mysql -h127.0.0.1 -P3307 -ugithub -p123456 dummy_db
 1 row in set (0.006 sec)
 ```
 
-## License
+## 开源协议
 
-This project is under the Apache 2.0 license. See the [LICENSE](./LICENSE) file for details.
+本项目使用Apache 2.0协议. 详情请见: [LICENSE](./LICENSE).
 
-## Acknowledgments
+## 告知
 
-- Thanks [mheath](https://github.com/mheath) for providing beautiful implementation codes.
+- 感谢 [mheath](https://github.com/mheath) 提供的基础代码.
+- 联系方式 - 微信: 95634620 邮件: [unrealwalker@126.com](mailto:unrealwalker@126.com)

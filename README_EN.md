@@ -103,4 +103,5 @@ This project is under the Apache 2.0 license. See the [LICENSE](./LICENSE) file 
 ## Acknowledgments
 
 - Thanks [mheath](https://github.com/mheath) for providing beautiful implementation codes.
+- Minimal version of Java: JDK11. (JDK8 under testing)
 - Contact - Wechat: 95634620 Mail: [unrealwalker@126.com](mailto:unrealwalker@126.com)

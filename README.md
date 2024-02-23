@@ -104,4 +104,5 @@ mysql -h127.0.0.1 -P3307 -ugithub -p123456 dummy_db
 ## 告知
 
 - 感谢 [mheath](https://github.com/mheath) 提供的基础代码.
+- 最小Java版本: JDK11. (JDK8在测试中)
 - 联系方式 - 微信: 95634620 邮件: [unrealwalker@126.com](mailto:unrealwalker@126.com)
